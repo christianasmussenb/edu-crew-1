@@ -1,4 +1,4 @@
-#!/Users/Nuevo/VSCODE/edu-crew/.venv/bin/python3
+#!/Users/cab/VSCODE/edu-crew-1/.venv/bin/python3
 """Extract pdf structure in XML format"""
 import logging
 import os.path
