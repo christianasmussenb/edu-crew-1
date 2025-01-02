@@ -1,0 +1,17 @@
+[project]
+name = "edu_flow2"
+version = "0.1.0"
+description = "edu_flow2 using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    "crewai[tools]>=0.76.9,<1.0.0",
+]
+
+[project.scripts]
+kickoff = "edu_flow2.main:kickoff"
+plot = "edu_flow2.main:plot"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
