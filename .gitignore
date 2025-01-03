@@ -1,4 +1,7 @@
 .env
+.DS_Store
+.vscode/
+.venv/
 __pycache__/
 lib/
 output/

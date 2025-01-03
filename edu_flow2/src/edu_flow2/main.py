@@ -34,19 +34,60 @@ class EduFlow(Flow):
     @listen(generate_educational_content)
     def save_to_markdown(self, content):
         output_dir = "output"
-        os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
+        os.makedirs(output_dir, exist_ok=True)
         
-        # Use topic and audience_level from input_variables to create the file name
         topic = self.input_variables.get("topic")
         audience_level = self.input_variables.get("audience_level")
-        file_name = f"{topic}_{audience_level}.md".replace(" ", "_")  # Replace spaces with underscores
-        
+        file_name = f"{topic}_{audience_level}.md".replace(" ", "_")
         output_path = os.path.join(output_dir, file_name)
         
         with open(output_path, "w") as f:
             for section in content:
                 f.write(section)
-                f.write("\n\n")  # Add space between sections
+                f.write("\n\n")
+        
+        # Llamar a la función para publicar en HubSpot
+        self.publish_to_hubspot(output_path, topic)
+
+    def publish_to_hubspot(self, markdown_path, title):
+        import requests
+        from datetime import datetime
+        
+        # Configuración de HubSpot
+        hubspot_api_key = os.getenv('HUBSPOT_API_KEY')
+        if not hubspot_api_key:
+            raise ValueError("HUBSPOT_API_KEY no está configurada")
+            
+        # Leer el contenido del archivo markdown
+        with open(markdown_path, 'r') as f:
+            content = f.read()
+            
+        # Preparar los datos para la API de HubSpot
+        blog_post = {
+            "name": title,
+            "contentGroupId": os.getenv('HUBSPOT_BLOG_ID'),  # ID del blog en HubSpot
+            "content": content,
+            "state": "DRAFT",  # o "PUBLISHED" para publicar directamente
+            "publishDate": datetime.now().isoformat(),
+            "blog_author": os.getenv('HUBSPOT_AUTHOR_ID'),
+            "meta_description": f"Contenido educativo sobre {title}"
+        }
+        
+        # Endpoint de la API de HubSpot
+        url = "https://api.hubapi.com/cms/v3/blogs/posts"
+        headers = {
+            "Authorization": f"Bearer {hubspot_api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        # Realizar la petición POST
+        response = requests.post(url, json=blog_post, headers=headers)
+        
+        if response.status_code == 201:
+            print(f"Post creado exitosamente en HubSpot: {title}")
+        else:
+            print(f"Error al crear el post: {response.status_code}")
+            print(response.json())
 
 def kickoff():
     edu_flow = EduFlow()
