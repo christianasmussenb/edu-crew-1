@@ -29,7 +29,7 @@ class EduContentWriterCrew():
 		return Agent(
 			config=self.agents_config['content_writer'],
 			llm=llm,
-			verbose=True
+			verbose=False
 		)
 
 	@agent
@@ -37,7 +37,7 @@ class EduContentWriterCrew():
 		return Agent(
 			config=self.agents_config['editor'],
 			llm=llm,
-			verbose=True
+			verbose=False
 		)
 
 	@agent
@@ -45,9 +45,17 @@ class EduContentWriterCrew():
 		return Agent(
 			config=self.agents_config['quality_reviewer'],
 			llm=llm,
+			verbose=False
+		)
+	
+	@agent
+	def blog_writer(self) -> Agent:
+		return Agent(
+			config=self.agents_config['blog_writer'],
+			llm=llm,
 			verbose=True
 		)
-
+	
 	@task
 	def writing_task(self) -> Task:
 		return Task(
@@ -72,6 +80,18 @@ class EduContentWriterCrew():
 			config=self.tasks_config['quality_review_task'],
 		)
 
+	@task
+	def blog_formatting_task(self) -> Task:
+		topic = self.input_variables.get("topic")
+		audience_level = self.input_variables.get("audience_level")
+		file_name = f"{topic}_{audience_level}_blob.md".replace(" ", "_")
+		blob_file_path = os.path.join('output', file_name)
+		
+		return Task(
+			config=self.tasks_config['blog_formatting_task'],
+			output_file=blob_file_path
+		)
+	
 	@crew
 	def crew(self) -> Crew:
 		"""Creates the EduContentWriter crew"""
@@ -79,6 +99,6 @@ class EduContentWriterCrew():
 			agents=self.agents, # Automatically created by the @agent decorator
 			tasks=self.tasks, # Automatically created by the @task decorator
 			process=Process.sequential,
-			verbose=True,
+			verbose=False,
 			# process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
 		)

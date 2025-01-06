@@ -5,7 +5,7 @@ research_task:
   expected_output: >
     A thorough research report on {topic} with relevant information that can inspire educational 
     content afterwards aimed at {audience_level}. The research report should also include 
-    references to the sources you used to create the content. A selection of no more than 5 topics.
+    references to the sources you used to create the content. A selection of no more than 3 topics.
   agent: researcher
 
 planning_task:

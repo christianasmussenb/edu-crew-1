@@ -33,7 +33,7 @@ class EduResearchCrew():
 		return Agent(
 			config=self.agents_config['researcher'],
 			llm=llm,
-			verbose=True,
+			verbose=False,
 			tools=[SerperDevTool()]
 		)
 
@@ -42,7 +42,7 @@ class EduResearchCrew():
 		return Agent(
 			config=self.agents_config['planner'],
 			llm=llm,
-			verbose=True
+			verbose=False
 		)
 
 	@task

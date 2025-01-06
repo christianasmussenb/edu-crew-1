@@ -32,6 +32,7 @@ def stream():
                     break
                 
                 message = progress_queue.get_nowait()
+                # Filtrar mensajes no deseados
                 if "pydantic" not in message.lower() and "warning" not in message.lower():
                     yield f"data: {message}\n\n"
                     first_message = False

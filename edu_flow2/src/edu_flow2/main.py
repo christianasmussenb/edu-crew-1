@@ -29,7 +29,7 @@ class EduFlow(Flow):
             writer_inputs = self.input_variables.copy()
             writer_inputs['section'] = section.model_dump_json()
             final_content.append(EduContentWriterCrew().crew().kickoff(writer_inputs).raw)
-        print(final_content)
+        #print(final_content)
         return final_content
 
     @listen(generate_educational_content)
@@ -39,20 +39,19 @@ class EduFlow(Flow):
         
         topic = self.input_variables.get("topic")
         audience_level = self.input_variables.get("audience_level")
-        file_name = f"{topic}_{audience_level}.md".replace(" ", "_")
-        output_path = os.path.join(output_dir, file_name)
+        base_file_name = f"{topic}_{audience_level}".replace(" ", "_")
         
-        with open(output_path, "w") as f:
-            for section in content:
+        # Guardar cada sección en un archivo separado
+        for index, section in enumerate(content, 1):
+            file_name = f"{base_file_name}_section_{index}.md"
+            output_path = os.path.join(output_dir, file_name)
+            
+            with open(output_path, "w") as f:
                 f.write(section)
-                f.write("\n\n")
-        
-        # Llamar a publish_to_hubspot con el archivo recién creado
-        try:
-            publish_to_hubspot(output_path)
-            print(f"✅ Contenido publicado exitosamente en HubSpot desde {output_path}")
-        except Exception as e:
-            print(f"❌ Error al publicar en HubSpot: {str(e)}")
+            
+            print(f"✅ Sección {index} guardada en: {output_path}")
+            #aca invocar la pubnlicacion del Blog
+            #publish_to_hubspot(output_path)
 
 def process_content(input_vars):
     edu_flow = EduFlow()

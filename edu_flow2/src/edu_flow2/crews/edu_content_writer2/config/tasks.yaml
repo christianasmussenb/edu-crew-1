@@ -14,6 +14,7 @@ writing_task:
     Ensure the content is formatted with clear headings and subheadings, and use bullet points
     where appropriate to enhance readability.
     No need to include summaries or conclusions of each section, just the content.
+    Translate the content to spanish.
     Write at the end of the piece "------ This is the end of the piece"
   agent: content_writer
 
@@ -31,6 +32,7 @@ editing_task:
     the content is formatted with clear headings and subheadings, and use bullet points where
     appropriate to enhance readability.
     We only want the section content back, nothing else. Do not include the feedback.
+    Translate the content to spanish.
     Check that the piece ends with "------ This is the end of the piece"
   agent: editor
 
@@ -44,5 +46,47 @@ quality_review_task:
     A final assessment of the content's adherence to best practices, ensuring it perfectly matches
     {audience_level} requirements. Confirm that all essential concepts have been addressed and that
     the content progresses logically, providing enough depth for learners without leaving gaps or
-    causing confusion. Check that the piece ends with "------ This is the end of the piece"
+    causing confusion. Translate the content to spanish.
+    Check that the piece ends with "------ This is the end of the piece"
   agent: quality_reviewer
+
+blog_formatting_task:
+  description: >
+    Transform the educational content into an engaging blog post format while maintaining its 
+    educational value. Ensure proper HTML formatting, create compelling headers, organize content 
+    with clear sections, and maintain a consistent writing style that resonates with a {audience_level} 
+    audience. Add relevant examples and maintain proper paragraph spacing and list formatting.
+  expected_output: >
+    A well-formatted blog post in HTML format
+    Format the reviewed educational content into a professional blog post. Follow these 
+    specific steps:
+    1. Review the content and identify main sections for proper header hierarchy
+    2. Apply HTML formatting following these rules:
+       - Use <h2> for main sections
+       - Use <h4> for subsections
+       - Wrap paragraphs in <p> tags
+       - Format lists with <ul> and <li> tags
+       - Use <strong> for emphasis where appropriate
+
+    3. Ensure proper content structure:
+       - Add a compelling introduction
+       - Organize content in logical sections
+       - Include clear transitions between sections
+       - Create a concise conclusion
+
+    4. Format special elements:
+       - Convert bullet points into proper HTML lists
+       - Format code examples or technical terms appropriately
+       - Ensure proper spacing between sections
+       - Add emphasis to key concepts using <strong> tags
+
+    5. Final checks:
+       - Verify all HTML tags are properly closed
+       - Ensure consistent formatting throughout
+       - Check that lists and paragraphs are properly aligned
+       - Validate that the content flows naturally
+
+    Output the final blog post with proper HTML formatting while maintaining the educational 
+    value and appropriate level for a {audience_level} audience.
+  agent: blog_writer
+  
