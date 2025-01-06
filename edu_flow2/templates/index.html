@@ -59,9 +59,49 @@
             
             <!-- Notificaciones -->
             <div id="notifications" class="fixed bottom-4 right-4 space-y-2"></div>
+            
+            <div id="progress" style="display: none;">
+                <h3>Progreso:</h3>
+                <div id="progress-content" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
+            </div>
         </div>
     </div>
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+    document.getElementById('contentForm').onsubmit = function(e) {
+        e.preventDefault();
+        
+        // Mostrar div de progreso
+        const progressDiv = document.getElementById('progress');
+        const progressContent = document.getElementById('progress-content');
+        progressDiv.style.display = 'block';
+        progressContent.innerHTML = '';
+        
+        // Enviar el formulario
+        const formData = new FormData(this);
+        fetch('/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Iniciar el stream de eventos
+                const eventSource = new EventSource('/stream');
+                eventSource.onmessage = function(e) {
+                    progressContent.innerHTML += `<div>${e.data}</div>`;
+                    progressContent.scrollTop = progressContent.scrollHeight;
+                };
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error);
+        });
+    };
+    </script>
 </body>
 </html> 

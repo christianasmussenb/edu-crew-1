@@ -18,6 +18,6 @@ LLM_CONFIGS = {
 LLM_CONFIG = LLM_CONFIGS["openai"] # Change this to switch between LLMs
 
 EDU_FLOW_INPUT_VARIABLES = {
-    "audience_level": os.getenv('EDU_FLOW_LEVEL', 'beginner'),
-    "topic": os.getenv('EDU_FLOW_TOPIC', 'Healthcare, latest advancements in medicine using AI'),
+    "audience_level": os.getenv('EDUFLOW_LEVEL', 'beginner'),
+    "topic": os.getenv('EDUFLOW_TOPIC', 'Latest LLM models and finance'),
 } 

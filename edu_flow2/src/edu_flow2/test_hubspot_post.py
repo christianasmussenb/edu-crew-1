@@ -32,7 +32,19 @@ def md_to_html(md_content):
 
 def create_blog_post(client, content, index, is_second_execution=False):
     """Crea un post de blog individual"""
-    title = content.split('\n')[0].replace('# ', '').replace('##', '').strip()
+    # Buscar la primera línea que comience con # para el título
+    lines = content.split('\n')
+    title = None
+    for line in lines:
+        if line.strip().startswith('#'):
+            title = line.strip().replace('#', '').strip()
+            break
+    
+    # Si no se encuentra un título válido, usar un título por defecto
+    if not title:
+        title = f"Part {index} - AI Content"
+    
+    # Limitar longitud del título
     title = title[:60]
     
     # Seleccionar configuración según la ejecución
@@ -68,18 +80,18 @@ def create_blog_post(client, content, index, is_second_execution=False):
         "state": "DRAFT",
         "language": "es-cl",
         "blogAuthorId": blog_author_id,
-        "slug": f"blog/healthcare-ai-part-{index}",
-        "metaDescription": "Avances en medicina usando IA: " + title,
+        "slug": f"blog/{title}",
+        "metaDescription": title,
         "postBody": f"""
         <img src="{image_url}" 
-             alt="IA en medicina" style="width:100%; max-width:800px; margin: 20px auto; display:block;">
+             alt="{title}" style="width:100%; max-width:800px; margin: 20px auto; display:block;">
         {md_to_html(content)}
         """,
         "postSummary": f"<p>{title}</p>",
         "rssBody": md_to_html(content),
         "rssSummary": f"<p>{title}</p>",
         "featuredImage": image_url,
-        "featuredImageAltText": "IA en medicina",
+        "featuredImageAltText": title,
         "currentlyPublished": False,
         "publicAccessRulesEnabled": False,
         "publishImmediately": False,

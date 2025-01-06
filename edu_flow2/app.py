@@ -1,63 +1,96 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 import subprocess
 import os
+import threading
+import time
+import queue
 
 app = Flask(__name__, 
     template_folder='templates',
     static_folder='static'
 )
 
+# Cola global para almacenar los mensajes
+progress_queue = queue.Queue()
+
+@app.route('/stream')
+def stream():
+    def generate():
+        while True:
+            try:
+                # Intentar obtener un mensaje de la cola
+                message = progress_queue.get_nowait()
+                yield f"data: {message}\n\n"
+            except queue.Empty:
+                # Si no hay mensajes, enviar un heartbeat
+                yield f"data: Procesando...\n\n"
+            time.sleep(30)  # Esperar 30 segundos antes de la siguiente actualización
+    
+    return Response(generate(), mimetype='text/event-stream')
+
+def monitor_process(process):
+    """Monitorea el proceso y añade mensajes a la cola"""
+    while True:
+        output = process.stdout.readline()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            progress_queue.put(output.strip())
+    
 @app.route('/', methods=['GET', 'POST'])
 def generate():
     if request.method == 'POST':
+        print("POST recibido")  # Debug log
         topic = request.form.get('topic', '').strip()
-        level = request.form.get('level', 'beginner')
+        level = request.form.get('level', '').strip()
         
-        # Validar que el topic no esté vacío
+        print(f"Topic: {topic}")  # Debug log
+        print(f"Level: {level}")  # Debug log
+        
+        # Validaciones
+        errors = []
         if not topic:
+            errors.append("Topic cannot be empty")
+        if len(topic) < 10:
+            errors.append("Topic must be at least 10 characters long")
+            
+        if not level or level not in ['beginner', 'intermediate', 'advanced']:
+            errors.append("Invalid audience level")
+            
+        if errors:
             return jsonify({
-                "success": False, 
-                "error": "Please enter a topic"
+                "success": False,
+                "error": " | ".join(errors)
             })
         
         try:
-            # Escribir las variables en el archivo config.py
-            config_path = 'src/edu_flow2/config.py'
-            with open(config_path, 'r') as file:
-                lines = file.readlines()
-            
-            # Actualizar las variables
-            for i, line in enumerate(lines):
-                if '"topic":' in line:
-                    lines[i] = f'    "topic": "{topic}",\n'
-                elif '"audience_level":' in line:
-                    lines[i] = f'    "audience_level": "{level}",\n'
-            
-            # Guardar el archivo actualizado
-            with open(config_path, 'w') as file:
-                file.writelines(lines)
-            
-            # Ejecutar el proceso
-            result = subprocess.run(
+            # Limpiar la cola de mensajes anteriores
+            while not progress_queue.empty():
+                progress_queue.get()
+
+            # Iniciar el proceso
+            process = subprocess.Popen(
                 ['crewai', 'flow', 'kickoff'],
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,  # Redirigir stderr a stdout
                 text=True,
-                check=True
+                bufsize=1,  # Line buffered
+                env=os.environ,
+                cwd=os.path.dirname(os.path.abspath(__file__))
             )
+            
+            # Iniciar thread para monitorear el proceso
+            monitor_thread = threading.Thread(target=monitor_process, args=(process,))
+            monitor_thread.daemon = True
+            monitor_thread.start()
             
             return jsonify({
                 "success": True,
-                "message": "Content generated successfully",
+                "message": "Process started successfully",
                 "topic": topic,
-                "level": level,
-                "output": result.stdout
+                "level": level
             })
             
-        except subprocess.CalledProcessError as e:
-            return jsonify({
-                "success": False,
-                "error": f"Process error: {e.stderr}"
-            })
         except Exception as e:
             return jsonify({
                 "success": False,
