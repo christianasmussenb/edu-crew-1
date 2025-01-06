@@ -13,32 +13,65 @@ app = Flask(__name__,
 # Cola global para almacenar los mensajes
 progress_queue = queue.Queue()
 
+# Variables globales para control
+process_active = False
+process_completed = False
+
 @app.route('/stream')
 def stream():
     def generate():
-        while True:
+        global process_active, process_completed
+        first_message = True
+        
+        while not process_completed:
             try:
-                # Intentar obtener un mensaje de la cola
+                if not process_active and not first_message:
+                    # Si el proceso terminó, enviar mensaje final
+                    process_completed = True
+                    yield f"data: Proceso completado ✅\n\n"
+                    break
+                
                 message = progress_queue.get_nowait()
-                yield f"data: {message}\n\n"
+                if "pydantic" not in message.lower() and "warning" not in message.lower():
+                    yield f"data: {message}\n\n"
+                    first_message = False
             except queue.Empty:
-                # Si no hay mensajes, enviar un heartbeat
-                yield f"data: Procesando...\n\n"
-            time.sleep(30)  # Esperar 30 segundos antes de la siguiente actualización
+                if first_message:
+                    yield f"data: Iniciando proceso...\n\n"
+                    first_message = False
+            time.sleep(5)
     
     return Response(generate(), mimetype='text/event-stream')
 
 def monitor_process(process):
     """Monitorea el proceso y añade mensajes a la cola"""
+    global process_active, process_completed
+    process_active = True
+    process_completed = False
+    
+    seen_messages = set()
+    
     while True:
         output = process.stdout.readline()
         if output == '' and process.poll() is not None:
+            process_active = False
             break
         if output:
-            progress_queue.put(output.strip())
+            message = output.strip()
+            if (message not in seen_messages and 
+                "pydantic" not in message.lower() and 
+                "warning" not in message.lower()):
+                seen_messages.add(message)
+                progress_queue.put(message)
     
+    # Esperar un momento para asegurar que todos los mensajes se procesaron
+    time.sleep(10)
+    process_active = False
+
 @app.route('/', methods=['GET', 'POST'])
 def generate():
+    global process_active, process_completed
+    
     if request.method == 'POST':
         print("POST recibido")  # Debug log
         topic = request.form.get('topic', '').strip()
@@ -64,7 +97,17 @@ def generate():
             })
         
         try:
-            # Limpiar la cola de mensajes anteriores
+            if process_active:
+                return jsonify({
+                    "success": False,
+                    "error": "Ya hay un proceso en ejecución"
+                })
+
+            # Resetear estados
+            process_active = False
+            process_completed = False
+            
+            # Limpiar la cola
             while not progress_queue.empty():
                 progress_queue.get()
 

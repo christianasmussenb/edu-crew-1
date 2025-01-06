@@ -9,7 +9,10 @@ load_dotenv()
 
 def md_to_html(md_content):
     """Convierte el contenido markdown a HTML manteniendo el formato"""
-    html = md_content
+    # Eliminar líneas no deseadas
+    unwanted_lines = ["This is the end of the piece"]
+    html = '\n'.join(line for line in md_content.split('\n') 
+                     if line.strip() not in unwanted_lines)
     
     # Headers primero
     html = html.replace('  ', ' ')  # Eliminar espacios dobles
@@ -20,12 +23,39 @@ def md_to_html(md_content):
     html = html.replace('\n', '</h2>', 1) if html.startswith('<h2>') else html
     html = html.replace('\n', '</h4>') if '<h4>' in html else html
     
+    # Formateo de listas y negritas
+    html = html.replace('-**', '<li><strong>')  # Inicio de elemento de lista con negrita
+    html = html.replace('**:', '</strong>:')    # Cierre de negrita con dos puntos
+    html = html.replace('**', '</strong>')      # Cierre de negrita normal
+    
+    # Convertir listas
+    lines = html.split('\n')
+    in_list = False
+    formatted_lines = []
+    
+    for line in lines:
+        if line.strip().startswith('<li>'):
+            if not in_list:
+                formatted_lines.append('<ul>')
+                in_list = True
+            formatted_lines.append(line.strip())
+        else:
+            if in_list:
+                formatted_lines.append('</ul>')
+                in_list = False
+            formatted_lines.append(line)
+    
+    if in_list:
+        formatted_lines.append('</ul>')
+    
+    html = '\n'.join(formatted_lines)
+    
     # Ahora sí limpiar cualquier # residual
     html = html.replace('#', '')
     
     # Párrafos sin líneas extra
     paragraphs = [p.strip() for p in html.split('\n\n') if p.strip()]
-    html = '\n'.join(f'<p>{p}</p>' if not p.startswith('<h') else p 
+    html = '\n'.join(f'<p>{p}</p>' if not (p.startswith('<h') or p.startswith('<ul>')) else p 
                      for p in paragraphs)
     
     return html
@@ -84,7 +114,7 @@ def create_blog_post(client, content, index, is_second_execution=False):
         "metaDescription": title,
         "postBody": f"""
         <img src="{image_url}" 
-             alt="{title}" style="width:100%; max-width:800px; margin: 20px auto; display:block;">
+             alt="{title}" style="width:50%; max-width:800px; margin: 20px auto; display:block;">
         {md_to_html(content)}
         """,
         "postSummary": f"<p>{title}</p>",

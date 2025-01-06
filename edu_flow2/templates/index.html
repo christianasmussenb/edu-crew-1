@@ -73,13 +73,11 @@
     document.getElementById('contentForm').onsubmit = function(e) {
         e.preventDefault();
         
-        // Mostrar div de progreso
         const progressDiv = document.getElementById('progress');
         const progressContent = document.getElementById('progress-content');
         progressDiv.style.display = 'block';
         progressContent.innerHTML = '';
         
-        // Enviar el formulario
         const formData = new FormData(this);
         fetch('/', {
             method: 'POST',
@@ -88,12 +86,22 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Iniciar el stream de eventos
                 const eventSource = new EventSource('/stream');
+                
                 eventSource.onmessage = function(e) {
+                    if (e.data.includes("Proceso completado")) {
+                        // Cerrar la conexión cuando el proceso termine
+                        eventSource.close();
+                        // Opcional: habilitar el botón de nuevo
+                        document.querySelector('button[type="submit"]').disabled = false;
+                    }
+                    
                     progressContent.innerHTML += `<div>${e.data}</div>`;
                     progressContent.scrollTop = progressContent.scrollHeight;
                 };
+                
+                // Deshabilitar el botón mientras se procesa
+                document.querySelector('button[type="submit"]').disabled = true;
             } else {
                 alert('Error: ' + data.error);
             }
