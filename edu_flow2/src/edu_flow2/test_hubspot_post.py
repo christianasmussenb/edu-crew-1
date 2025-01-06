@@ -1,9 +1,9 @@
 import os
+import glob
 import hubspot
 from hubspot.cms.blogs.blog_posts import BlogPost, ApiException
 from datetime import datetime
 from dotenv import load_dotenv
-from pprint import pprint
 
 load_dotenv()
 
@@ -95,13 +95,11 @@ def create_blog_post(client, content, index, is_second_execution=False):
     except Exception as e:
         print(f"\n❌ Error al crear el post {index}: {str(e)}")
 
-def test_hubspot_post_sdk():
-    HUBSPOT_API_KEY = os.getenv('HUBSPOT_API_KEY')
-    OTRA_HUBSPOT_API_KEY = os.getenv('OTRA_HUBSPOT_API_KEY')
-    
-    # Leer el archivo markdown
-    md_file_path = "edu_flow2/output/Healthcare,_latest_advancements_in_medicine_using_AI_begginer.md"
-    with open(md_file_path, 'r', encoding='utf-8') as file:
+def publish_to_hubspot(markdown_path):
+    """
+    Publica el contenido markdown en HubSpot dividido en secciones.
+    """
+    with open(markdown_path, 'r', encoding='utf-8') as file:
         content = file.read()
     
     # Dividir el contenido en secciones
@@ -109,24 +107,27 @@ def test_hubspot_post_sdk():
     
     # Primera ejecución
     try:
-        client = hubspot.Client.create(access_token=HUBSPOT_API_KEY)
-        print("\n🚀 Iniciando primera ejecución...")
+        client = hubspot.Client.create(access_token=os.getenv('HUBSPOT_API_KEY'))
+        print("\n🚀 Iniciando publicación en primer blog...")
         for i, section in enumerate(sections, 1):
             if section.strip():
                 create_blog_post(client, section.strip(), i, False)
     except Exception as e:
         print(f"Error en primera ejecución: {str(e)}")
+        raise
     
     # Segunda ejecución
     try:
-        client2 = hubspot.Client.create(access_token=OTRA_HUBSPOT_API_KEY)
-        print("\n🚀 Iniciando segunda ejecución...")
+        client2 = hubspot.Client.create(access_token=os.getenv('OTRA_HUBSPOT_API_KEY'))
+        print("\n🚀 Iniciando publicación en segundo blog...")
         for i, section in enumerate(sections, 1):
             if section.strip():
                 create_blog_post(client2, section.strip(), i, True)
     except Exception as e:
         print(f"Error en segunda ejecución: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     print("🚀 Iniciando creación de múltiples posts en HubSpot...")
-    test_hubspot_post_sdk()
+    test_file = "edu_flow2/output/Healthcare,_latest_advancements_in_medicine_using_AI_begginer.md"
+    publish_to_hubspot(test_file)

@@ -6,9 +6,10 @@ from pydantic import BaseModel
 
 from crewai.flow.flow import Flow, listen, start
 
-from .crews.edu_research2.edu_research2_crew import EduResearchCrew
-from .crews.edu_content_writer2.edu_content_writer2_crew import EduContentWriterCrew
-from .config import EDU_FLOW_INPUT_VARIABLES
+from edu_flow2.crews.edu_research2.edu_research2_crew import EduResearchCrew
+from edu_flow2.crews.edu_content_writer2.edu_content_writer2_crew import EduContentWriterCrew
+from edu_flow2.config import EDU_FLOW_INPUT_VARIABLES
+from .test_hubspot_post import test_hubspot_post_sdk
 
 api_key = os.getenv('LANGTRACE_API_KEY')
 
@@ -46,48 +47,18 @@ class EduFlow(Flow):
                 f.write(section)
                 f.write("\n\n")
         
-        # Llamar a la función para publicar en HubSpot
-        self.publish_to_hubspot(output_path, topic)
+        # Llamar a publish_to_hubspot con el archivo recién creado
+        try:
+            from .test_hubspot_post import publish_to_hubspot
+            publish_to_hubspot(output_path)
+            print(f"✅ Contenido publicado exitosamente en HubSpot desde {output_path}")
+        except Exception as e:
+            print(f"❌ Error al publicar en HubSpot: {str(e)}")
 
-    def publish_to_hubspot(self, markdown_path, title):
-        import requests
-        from datetime import datetime
-        
-        # Configuración de HubSpot
-        hubspot_api_key = os.getenv('HUBSPOT_API_KEY')
-        if not hubspot_api_key:
-            raise ValueError("HUBSPOT_API_KEY no está configurada")
-            
-        # Leer el contenido del archivo markdown
-        with open(markdown_path, 'r') as f:
-            content = f.read()
-            
-        # Preparar los datos para la API de HubSpot
-        blog_post = {
-            "name": title,
-            "contentGroupId": os.getenv('HUBSPOT_BLOG_ID'),  # ID del blog en HubSpot
-            "content": content,
-            "state": "DRAFT",  # o "PUBLISHED" para publicar directamente
-            "publishDate": datetime.now().isoformat(),
-            "blog_author": os.getenv('HUBSPOT_AUTHOR_ID'),
-            "meta_description": f"Contenido educativo sobre {title}"
-        }
-        
-        # Endpoint de la API de HubSpot
-        url = "https://api.hubapi.com/cms/v3/blogs/posts"
-        headers = {
-            "Authorization": f"Bearer {hubspot_api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        # Realizar la petición POST
-        response = requests.post(url, json=blog_post, headers=headers)
-        
-        if response.status_code == 201:
-            print(f"Post creado exitosamente en HubSpot: {title}")
-        else:
-            print(f"Error al crear el post: {response.status_code}")
-            print(response.json())
+def process_content(input_vars):
+    edu_flow = EduFlow()
+    edu_flow.input_variables = input_vars
+    return edu_flow.kickoff()
 
 def kickoff():
     edu_flow = EduFlow()
