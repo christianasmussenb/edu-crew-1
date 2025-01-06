@@ -1,0 +1,87 @@
+/* Animaciones para las notificaciones */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Estilos para el spinner de carga */
+.loading-state svg {
+    animation: spin 1s linear infinite;
+}
+
+/* Estilos para las notificaciones */
+#notifications > div {
+    animation: slideIn 0.3s ease-out;
+}
+
+#notifications > div.hiding {
+    animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Mejoras en la interactividad */
+.form-input:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+    outline: none;
+}
+
+/* Efectos hover mejorados */
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Estilo para el resultado */
+#result pre {
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+/* Estilo para los mensajes de error */
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    button {
+        padding: 0.75rem;
+    }
+    
+    #notifications {
+        width: 90%;
+        left: 5%;
+        right: 5%;
+    }
+} 

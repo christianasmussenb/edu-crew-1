@@ -14,6 +14,7 @@ writing_task:
     Ensure the content is formatted with clear headings and subheadings, and use bullet points
     where appropriate to enhance readability.
     No need to include summaries or conclusions of each section, just the content.
+    Write at the end of the piece "------ This is the end of the piece"
   agent: content_writer
 
 editing_task:
@@ -30,6 +31,7 @@ editing_task:
     the content is formatted with clear headings and subheadings, and use bullet points where
     appropriate to enhance readability.
     We only want the section content back, nothing else. Do not include the feedback.
+    Check that the piece ends with "------ This is the end of the piece"
   agent: editor
 
 quality_review_task:
@@ -42,5 +44,5 @@ quality_review_task:
     A final assessment of the content's adherence to best practices, ensuring it perfectly matches
     {audience_level} requirements. Confirm that all essential concepts have been addressed and that
     the content progresses logically, providing enough depth for learners without leaving gaps or
-    causing confusion.
+    causing confusion. Check that the piece ends with "------ This is the end of the piece"
   agent: quality_reviewer

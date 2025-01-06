@@ -44,8 +44,8 @@ def create_blog_post(client, content, index, is_second_execution=False):
             "https://45461238.fs1.hubspotusercontent-na1.net/hubfs/45461238/pexels-photo-3313333.jpg",
             "https://45461238.fs1.hubspotusercontent-na1.net/hubfs/45461238/1_edICTq8-DfLxpOJE38hEmA.jpeg"
         ]
-        content_group_id = "160750783103"
-        blog_author_id = "160742183605"
+        content_group_id = os.getenv('HUBSPOT_BLOG_ID')
+        blog_author_id = os.getenv('HUBSPOT_AUTHOR_ID')
     else:
         images = [
             "https://www.casmuss.com/hubfs/Copy%20of%20HTC%20-Casos%20de%20Exito%205x5%20(6).jpg",
@@ -55,8 +55,8 @@ def create_blog_post(client, content, index, is_second_execution=False):
             "https://www.casmuss.com/hubfs/Copy%20of%20HTC%20-Casos%20de%20Exito%205x5%20(2).jpg",
             "https://www.casmuss.com/hubfs/Copy%20of%20HTC%20-Casos%20de%20Exito%205x5%20(1).jpg"
         ]
-        content_group_id = "49891678929"
-        blog_author_id = "51700133830"
+        content_group_id = os.getenv('OTRA_HUBSPOT_BLOG_ID')
+        blog_author_id = os.getenv('OTRA_HUBSPOT_AUTHOR_ID')
 
     image_url = images[index % len(images)]
     

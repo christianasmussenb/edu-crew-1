@@ -9,7 +9,7 @@ from crewai.flow.flow import Flow, listen, start
 from edu_flow2.crews.edu_research2.edu_research2_crew import EduResearchCrew
 from edu_flow2.crews.edu_content_writer2.edu_content_writer2_crew import EduContentWriterCrew
 from edu_flow2.config import EDU_FLOW_INPUT_VARIABLES
-from .test_hubspot_post import test_hubspot_post_sdk
+from .test_hubspot_post import publish_to_hubspot
 
 api_key = os.getenv('LANGTRACE_API_KEY')
 
@@ -49,7 +49,6 @@ class EduFlow(Flow):
         
         # Llamar a publish_to_hubspot con el archivo recién creado
         try:
-            from .test_hubspot_post import publish_to_hubspot
             publish_to_hubspot(output_path)
             print(f"✅ Contenido publicado exitosamente en HubSpot desde {output_path}")
         except Exception as e:
