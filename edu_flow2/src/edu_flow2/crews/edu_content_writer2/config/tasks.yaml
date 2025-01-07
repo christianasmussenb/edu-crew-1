@@ -89,4 +89,15 @@ blog_formatting_task:
     Output the final blog post with proper HTML formatting while maintaining the educational 
     value and appropriate level for a {audience_level} audience.
   agent: blog_writer
+
+hubspot_posting_task:
+  description: >
+    Post the formatted blog content to HubSpot. Use the HubSpot Blog Post Tool to publish
+    the content to both configured blogs. The content should be properly formatted and
+    include all necessary metadata.
+    The blog file is located at: {blog_file}
+  expected_output: >
+    Confirmation that the blog post has been successfully published to both HubSpot blogs
+    with proper formatting and metadata.
+  agent: blog_writer
   

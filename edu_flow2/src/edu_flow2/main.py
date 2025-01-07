@@ -49,9 +49,8 @@ class EduFlow(Flow):
             with open(output_path, "w") as f:
                 f.write(section)
             
-            print(f"✅ Sección {index} guardada en: {output_path}")
-            #aca invocar la pubnlicacion del Blog
-            #publish_to_hubspot(output_path)
+                #publish_to_hubspot(output_path)
+                print(f"✅ Sección {index} guardada en: {output_path}")
 
 def process_content(input_vars):
     edu_flow = EduFlow()

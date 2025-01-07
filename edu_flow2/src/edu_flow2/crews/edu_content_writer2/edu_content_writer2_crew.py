@@ -3,6 +3,7 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 import os
 from src.edu_flow2.config import EDU_FLOW_INPUT_VARIABLES
+from src.edu_flow2.tools.custom_tool import HubSpotPostTool
 
 # Uncomment the following line to use an example of a custom tool
 # from edu_content_writer.tools.custom_tool import MyCustomTool
@@ -84,14 +85,30 @@ class EduContentWriterCrew():
 	def blog_formatting_task(self) -> Task:
 		topic = self.input_variables.get("topic")
 		audience_level = self.input_variables.get("audience_level")
-		file_name = f"{topic}_{audience_level}_blob.md".replace(" ", "_")
-		blob_file_path = os.path.join('output', file_name)
+		file_name = f"{topic}_{audience_level}_blog.md".replace(" ", "_")
+		blog_file_path = os.path.join('output', file_name)
 		
 		return Task(
 			config=self.tasks_config['blog_formatting_task'],
-			output_file=blob_file_path
+			output_file=blog_file_path
 		)
-	
+
+	@task
+	def hubspot_posting_task(self) -> Task:
+		topic = self.input_variables.get("topic")
+		audience_level = self.input_variables.get("audience_level")
+		file_name = f"{topic}_{audience_level}_blog.md".replace(" ", "_")
+		blog_file_path = os.path.join('output', file_name)
+		
+		hubspot_tool = HubSpotPostTool()
+		return Task(
+			config=self.tasks_config['hubspot_posting_task'],
+				tools=[hubspot_tool],
+				context={
+					"blog_file": blog_file_path  # Pasar el path del archivo blog
+				}
+		)
+
 	@crew
 	def crew(self) -> Crew:
 		"""Creates the EduContentWriter crew"""
