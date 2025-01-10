@@ -6,12 +6,12 @@ LLM_CONFIGS = {
         "api_key": os.getenv('OPENAI_API_KEY')
     },
     "groq": {
-        "model": "groq/llama3-groq-8b-8192-tool-use-preview", 
+        "model": "groq/llama3-groq-8b-8192", 
         "api_key": os.getenv('GROQ_API_KEY')
     },
-    "anthropic": {
-        "model": "anthropic/claude-3-5-sonnet-20240620",
-        "api_key": os.getenv('ANTHROPIC_API_KEY')
+    "cerebras": {
+        "model": "cerebras/gemma2-9b",
+        "api_key": os.getenv('CEREBRAS_API_KEY')
     }
 }
 

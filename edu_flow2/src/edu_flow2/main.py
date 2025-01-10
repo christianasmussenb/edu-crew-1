@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from random import randint
+
 import os
-from langtrace_python_sdk import langtrace
 from pydantic import BaseModel
 
 from crewai.flow.flow import Flow, listen, start
@@ -9,10 +8,11 @@ from crewai.flow.flow import Flow, listen, start
 from edu_flow2.crews.edu_research2.edu_research2_crew import EduResearchCrew
 from edu_flow2.crews.edu_content_writer2.edu_content_writer2_crew import EduContentWriterCrew
 from edu_flow2.config import EDU_FLOW_INPUT_VARIABLES
+
 from .test_hubspot_post import publish_to_hubspot
 
+from langtrace_python_sdk import langtrace
 api_key = os.getenv('LANGTRACE_API_KEY')
-
 langtrace.init(api_key=api_key)
 
 class EduFlow(Flow):

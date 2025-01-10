@@ -103,10 +103,10 @@ class EduContentWriterCrew():
 		hubspot_tool = HubSpotPostTool()
 		return Task(
 			config=self.tasks_config['hubspot_posting_task'],
-				tools=[hubspot_tool],
-				context={
-					"blog_file": blog_file_path  # Pasar el path del archivo blog
-				}
+			tools=[hubspot_tool],
+			context={
+				"blog_file": blog_file_path  # Pasar el path del archivo blog
+			}
 		)
 
 	@crew
