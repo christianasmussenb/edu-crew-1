@@ -9,7 +9,7 @@ from edu_flow2.crews.edu_research2.edu_research2_crew import EduResearchCrew
 from edu_flow2.crews.edu_content_writer2.edu_content_writer2_crew import EduContentWriterCrew
 from edu_flow2.config import EDU_FLOW_INPUT_VARIABLES
 
-from .test_hubspot_post import publish_to_hubspot
+#from .test_hubspot_post import publish_to_hubspot
 
 from langtrace_python_sdk import langtrace
 api_key = os.getenv('LANGTRACE_API_KEY')
@@ -28,6 +28,7 @@ class EduFlow(Flow):
         for section in plan.sections:
             writer_inputs = self.input_variables.copy()
             writer_inputs['section'] = section.model_dump_json()
+            #writer_inputs['blog'] = blog
             final_content.append(EduContentWriterCrew().crew().kickoff(writer_inputs).raw)
         #print(final_content)
         return final_content

@@ -735,8 +735,8 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "crewai", extras = ["tools"], specifier = ">=0.76.9,<1.0.0" },
-    { name = "hubspot-api-client", specifier = ">=11.1.0" },
-    { name = "langtrace-python-sdk", specifier = ">=3.3.18" },
+    { name = "hubspot-api-client" },
+    { name = "langtrace-python-sdk" },
 ]
 
 [[package]]

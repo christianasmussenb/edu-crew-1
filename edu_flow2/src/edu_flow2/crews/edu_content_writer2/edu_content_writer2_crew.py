@@ -3,13 +3,9 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 import os
 from src.edu_flow2.config import EDU_FLOW_INPUT_VARIABLES
-from src.edu_flow2.tools.custom_tool import HubSpotPostTool
-
-# Uncomment the following line to use an example of a custom tool
-# from edu_content_writer.tools.custom_tool import MyCustomTool
-
-# Check our tools documentations for more information on how to use them
-# from crewai_tools import SerperDevTool
+#from src.edu_flow2.tools.custom_tool import HubSpotPostTool, Blog
+#from pydantic import BaseModel, Field
+#from typing import Type
 
 @CrewBase
 class EduContentWriterCrew():
@@ -54,7 +50,8 @@ class EduContentWriterCrew():
 		return Agent(
 			config=self.agents_config['blog_writer'],
 			llm=llm,
-			verbose=True
+			verbose=True,
+			#tools=[HubSpotPostTool()],
 		)
 	
 	@task
@@ -93,21 +90,28 @@ class EduContentWriterCrew():
 			output_file=blog_file_path
 		)
 
+	"""	
 	@task
 	def hubspot_posting_task(self) -> Task:
 		topic = self.input_variables.get("topic")
 		audience_level = self.input_variables.get("audience_level")
 		file_name = f"{topic}_{audience_level}_blog.md".replace(" ", "_")
 		blog_file_path = os.path.join('output', file_name)
-		
+		content_group_id = os.getenv("OTRA_HUBSPOT_BLOG_ID")
+		blog_author_id = os.getenv("OTRA_HUBSPOT_AUTHOR_ID")
+		access_token = os.getenv("OTRA_HUBSPOT_API_KEY")
 		hubspot_tool = HubSpotPostTool()
 		return Task(
 			config=self.tasks_config['hubspot_posting_task'],
-			tools=[hubspot_tool],
+			tools=[hubspot_tool(blog_file_path, content_group_id, blog_author_id, access_token)],
 			context={
-				"blog_file": blog_file_path  # Pasar el path del archivo blog
+				"blog_file": blog_file_path,  # Pasar el path del archivo blog
+			#	"content_group_id": content_group_id,
+			#	"blog_author_id": blog_author_id,
+			#	"access_token": access_token,
 			}
 		)
+		"""
 
 	@crew
 	def crew(self) -> Crew:

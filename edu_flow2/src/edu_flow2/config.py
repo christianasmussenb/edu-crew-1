@@ -10,7 +10,7 @@ LLM_CONFIGS = {
         "api_key": os.getenv('GROQ_API_KEY')
     },
     "cerebras": {
-        "model": "cerebras/gemma2-9b",
+        "model": "cerebras/por definir",
         "api_key": os.getenv('CEREBRAS_API_KEY')
     }
 }
