@@ -36,3 +36,4 @@ ENV/
 # Project specific
 edu_flow2/output/*.md
 .DS_Store
+env_copy

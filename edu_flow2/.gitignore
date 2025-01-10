@@ -1,3 +1,6 @@
 .env
 __pycache__/
 lib/
+env_copy
+.DS_Store
+.venv/
